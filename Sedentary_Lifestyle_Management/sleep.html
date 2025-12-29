@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleep Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="overlay" onclick="closeNav()"></div>
+    <div id="toast"></div>
+
+    <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <a href="index.html">📊 Dashboard</a>
+        <a href="profile.html">👤 User Profile</a>
+        <a href="diet.html">🍎 Diet Tracker</a>
+        <a href="walking.html">👣 Walking</a>
+        <a href="water.html">💧 Water Tracker</a>
+        <a href="sedentary.html">🪑 Sedentary Timer</a>
+        <a href="stairs.html">🪜 Stairs Tracker</a>
+        <a href="sleep.html" style="color: #6ab3f8;">😴 Sleep Manager</a>
+        <a href="exercise.html">🏃 Exercise</a>
+    </div>
+
+    <div class="header-bar">
+        <span class="menu-icon" onclick="openNav()">&#9776;</span>
+    </div>
+
+    <div class="container" style="margin-top: 0;">
+        <h2>😴 Sleep Tracker</h2>
+        
+        <div class="card">
+            <h3>Log Sleep</h3>
+            <label>Bedtime:</label>
+            <input type="datetime-local" id="sleep-start">
+            
+            <label>Wake Time:</label>
+            <input type="datetime-local" id="sleep-end">
+            
+            <button class="primary-btn" onclick="addSleep()" style="width:100%; margin-top:10px;">Save Record</button>
+        </div>
+
+        <div class="card">
+            <h3>History</h3>
+            <div id="sleep-list" style="max-height:200px; overflow-y:auto;"></div>
+            <button class="danger-btn small" onclick="clearSleep()" style="width:100%; margin-top:10px;">Clear History</button>
+        </div>
+    </div>
+
+    <script>
+        function openNav() { document.getElementById("mySidenav").style.width = "250px"; document.getElementById("overlay").style.display = "block"; }
+        function closeNav() { document.getElementById("mySidenav").style.width = "0"; document.getElementById("overlay").style.display = "none"; }
+        function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.className="show"; setTimeout(()=>t.className=t.className.replace("show",""),3000); }
+
+        let sleepRecords = JSON.parse(localStorage.getItem('sleepRecords') || '[]');
+
+        function renderList() {
+            const list = document.getElementById('sleep-list');
+            list.innerHTML = '';
+            if(sleepRecords.length === 0) list.innerHTML = '<p style="text-align:center;color:#999;">No records.</p>';
+            
+            sleepRecords.forEach(r => {
+                const div = document.createElement('div');
+                div.className = 'food-list-item';
+                const d = new Date(r.end);
+                
+                let badge = 'ok';
+                if(r.hours < 6) badge = 'warn';
+                
+                div.innerHTML = `
+                    <div>
+                        <strong>${d.toLocaleDateString()}</strong>
+                        <span class="badge ${badge}" style="margin-left:5px;">${r.hours} hrs</span>
+                    </div>
+                    <small style="color:#777;">${new Date(r.start).getHours()}:${String(new Date(r.start).getMinutes()).padStart(2,'0')} - ${new Date(r.end).getHours()}:${String(new Date(r.end).getMinutes()).padStart(2,'0')}</small>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function addSleep() {
+            const s = document.getElementById('sleep-start').value;
+            const e = document.getElementById('sleep-end').value;
+            
+            if(!s || !e) return showToast('Please select times');
+            
+            const start = new Date(s);
+            const end = new Date(e);
+            
+            if(end <= start) return showToast('Wake time must be after bed time');
+            
+            const diff = (end - start) / (1000 * 60 * 60); // hours
+            const hours = Math.round(diff * 10) / 10;
+            
+            sleepRecords.unshift({
+                id: Date.now(),
+                start: s,
+                end: e,
+                hours: hours,
+                ageGroup: 'adult' // simplified
+            });
+            
+            localStorage.setItem('sleepRecords', JSON.stringify(sleepRecords));
+            renderList();
+            showToast('Sleep Saved');
+        }
+
+        function clearSleep() {
+            if(confirm('Clear history?')) {
+                sleepRecords = [];
+                localStorage.removeItem('sleepRecords');
+                renderList();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', renderList);
+    </script>
+</body>
+</html>
