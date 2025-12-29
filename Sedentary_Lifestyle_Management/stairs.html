@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stairs Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="overlay" onclick="closeNav()"></div>
+    <div id="toast"></div>
+
+    <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <a href="index.html">📊 Dashboard</a>
+        <a href="profile.html">👤 User Profile</a>
+        <a href="diet.html">🍎 Diet Tracker</a>
+        <a href="walking.html">👣 Walking</a>
+        <a href="water.html">💧 Water Tracker</a>
+        <a href="sedentary.html">🪑 Sedentary Timer</a>
+        <a href="stairs.html" style="color: #6ab3f8;">🪜 Stairs Tracker</a>
+        <a href="sleep.html">😴 Sleep Manager</a>
+        <a href="exercise.html">🏃 Exercise</a>
+    </div>
+
+    <div class="header-bar">
+        <span class="menu-icon" onclick="openNav()">&#9776;</span>
+    </div>
+
+    <div class="container" style="margin-top: 0;">
+        <h2>🪜 Stairs Tracker</h2>
+        
+        <div class="card" style="text-align:center; background:#fff8e1;">
+            <h3 style="margin-top:0;">Est. Calories Burned</h3>
+            <div id="cal-display" style="font-size:2.5em; font-weight:bold; color:#e67e22;">0</div>
+            <small>kcal</small>
+        </div>
+
+        <div class="action-grid">
+            <div class="action-card" style="border-top: 4px solid #ff6b6b;">
+                <h3>⬆️ Up</h3>
+                <div id="up-count" style="font-size:2em; font-weight:bold;">0</div>
+                <small>Floors</small>
+                <button class="primary-btn small" onclick="addFloor('up')" style="width:100%; margin-top:10px;">+1 Floor</button>
+            </div>
+            <div class="action-card" style="border-top: 4px solid #4ecdc4;">
+                <h3>⬇️ Down</h3>
+                <div id="down-count" style="font-size:2em; font-weight:bold;">0</div>
+                <small>Floors</small>
+                <button class="secondary small" onclick="addFloor('down')" style="width:100%; margin-top:10px;">+1 Floor</button>
+            </div>
+        </div>
+
+        <div style="text-align:center;">
+            <button class="danger-btn small" onclick="resetStairs()">Reset Counter</button>
+        </div>
+    </div>
+
+    <script>
+        function openNav() { document.getElementById("mySidenav").style.width = "250px"; document.getElementById("overlay").style.display = "block"; }
+        function closeNav() { document.getElementById("mySidenav").style.width = "0"; document.getElementById("overlay").style.display = "none"; }
+        function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.className="show"; setTimeout(()=>t.className=t.className.replace("show",""),3000); }
+
+        let up = parseInt(localStorage.getItem('stairsUp')) || 0;
+        let down = parseInt(localStorage.getItem('stairsDown')) || 0;
+        const weight = Number(localStorage.getItem('profileWeight')) || 70;
+
+        function updateUI() {
+            document.getElementById('up-count').textContent = up;
+            document.getElementById('down-count').textContent = down;
+            
+            // METs assumption: Up=8.0, Down=3.0. Avg floor 3 meters. Very rough est.
+            // Simplified logic: Up = 0.17 kcal/step * 20 steps/floor * weight/70
+            const calUp = up * 20 * 0.15 * (weight/70);
+            const calDown = down * 20 * 0.05 * (weight/70);
+            document.getElementById('cal-display').textContent = (calUp + calDown).toFixed(1);
+
+            localStorage.setItem('stairsUp', up);
+            localStorage.setItem('stairsDown', down);
+        }
+
+        function addFloor(dir) {
+            if(dir === 'up') up++;
+            else down++;
+            updateUI();
+        }
+
+        function resetStairs() {
+            if(confirm('Reset counters?')) {
+                up = 0; down = 0;
+                updateUI();
+            }
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
