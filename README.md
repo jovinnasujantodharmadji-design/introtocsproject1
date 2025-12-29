@@ -5,7 +5,7 @@
 
 ## 🌐 Live Demo
 Access the live application here:
-👉 [**See The Source Code (GitHub Pages)**](https://github.com/Ch4Angelia/computerscience)
+👉 [**See The Source Code (GitHub Pages)**](https://github.com/jovinnasujantodharmadji-design/introtocsproject1))
 👉 [**Open Website (Vercel Pages)**](https://computerscience-zeta.vercel.app/)
 
 ## 🚀 Core Features
